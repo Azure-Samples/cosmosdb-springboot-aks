@@ -65,7 +65,7 @@ public class UserController {
         }
 
         User saved = users.save(user);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        return new ResponseEntity<>(saved, HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
