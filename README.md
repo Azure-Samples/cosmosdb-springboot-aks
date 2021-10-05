@@ -14,7 +14,7 @@ In this tutorial, you will setup and build a Spring Boot application to perform 
 
 ## Create a resource group for the Azure resources used in this tutorial
 
-1. Log in to your Azure account:
+1. Sign in to your Azure account using Azure CLI:
 
    ```azurecli
    az login
@@ -34,7 +34,7 @@ In this tutorial, you will setup and build a Spring Boot application to perform 
 
 ## Create an Azure Cosmos DB SQL API database account
 
-Use this command to create an [Azure Cosmos DB SQL API database account](https://docs.microsoft.com/azure/cosmos-db/sql/manage-with-cli#create-an-azure-cosmos-db-account) using the Azure CLI.
+Use this command to create an [Azure Cosmos DB SQL API database account](manage-with-cli#create-an-azure-cosmos-db-account) using the Azure CLI.
 
 ```azurecli
 az cosmosdb create --name <enter account name> --resource-group <enter resource group name>
@@ -42,6 +42,7 @@ az cosmosdb create --name <enter account name> --resource-group <enter resource 
 
 ## Create a private Azure Container Registry using the Azure CLI
 
+> [!NOTE]
 > Replace `cosmosdbspringbootregistry` with a unique name for your registry.
 
 ```azurecli
@@ -49,7 +50,7 @@ az acr create --resource-group cosmosdb-springboot-aks-rg --location eastus \
     --name cosmosdbspringbootregistry --sku Basic
 ```
 
-## Create a Kubernetes Cluster on AKS using the Azure CLI
+## Create an AKS cluster using the Azure CLI
 
 1. The following command creates a Kubernetes cluster in the *cosmosdb-springboot-aks-rg* resource group, with *cosmosdb-springboot-aks* as the cluster name, with Azure Container Registry (ACR) `cosmosdbspringbootregistry` attached:
 
@@ -79,21 +80,30 @@ az acr create --resource-group cosmosdb-springboot-aks-rg --location eastus \
    kubectl get nodes
    ```
 
-## Run the application locally
+## Build the application
 
 1. Clone the application and change into the right directory.
 
-   ```bash
-   git clone https://github.com/Azure-Samples/cosmosdb-springboot-aks.git
-
-   cd cosmosdb-springboot-aks
-   ```
+    ```bash
+    git clone https://github.com/Azure-Samples/cosmosdb-springboot-aks.git
+    
+    cd cosmosdb-springboot-aks
+    ```
 
 1. Use Maven to build the application.
 
    ```bash
    ./mvnw install
    ```
+
+## Run the application locally
+
+> [!NOTE]
+> If you intend to run the application on AKS, skip this section and move to [Push Docker image to Azure Container Registry](#push-docker-image-to-azure-container-registry)
+
+
+
+
 
 1. Before you run the application, update the `application.properties` file with the details of your Azure Cosmos DB account.
 
@@ -104,7 +114,8 @@ az acr create --resource-group cosmosdb-springboot-aks-rg --location eastus \
    azure.cosmos.populateQueryMetrics=false
    ```
 
-   > The database will get created automatically once you start the application along with a container named `users`.
+   > [!NOTE]
+   > The database and a container (`users`) will get created automatically once you start the application.
 
 1. Run the application locally.
 
@@ -122,6 +133,7 @@ az acr create --resource-group cosmosdb-springboot-aks-rg --location eastus \
    docker build -t cosmosdbspringbootregistry.azurecr.io/spring-cosmos-app:v1 .
    ```
 
+   > [!NOTE]
    > `cosmosdbspringbootregistry.azurecr.io` is the Azure Container Registry server name
 
 1. Log into Azure Container Registry.
@@ -158,6 +170,10 @@ az acr create --resource-group cosmosdb-springboot-aks-rg --location eastus \
     ...
     ```
 
+    > [!NOTE]
+    > The database and a container (`users`) will get created automatically once you start the application.
+
+
 2. Deploy to Kubernetes and wait for the `Pod` to transition to `Running` state:
 
     ```bash
@@ -166,10 +182,13 @@ az acr create --resource-group cosmosdb-springboot-aks-rg --location eastus \
     kubectl get pods -l=app=spring-cosmos-app -w
     ```
 
+   > [!NOTE]
    > You can check application logs using: `kubectl logs -f $(kubectl get pods -l=app=spring-cosmos-app -o=jsonpath='{.items[0].metadata.name}') -c spring-cosmos-app`
 
 
 ## Access the application endpoint
+
+In this section, you will test the application by invoking its REST endpoints.
 
 1. Run this command to access the application locally over port `8080`:
 
@@ -237,6 +256,7 @@ az acr create --resource-group cosmosdb-springboot-aks-rg --location eastus \
 
 1. Create a Kubernetes Service of type `LoadBalancer`
 
+    > [!NOTE]
     > This will create an Azure Load Balancer with a public IP address.
 
     ```bash
@@ -252,6 +272,7 @@ az acr create --resource-group cosmosdb-springboot-aks-rg --location eastus \
     spring-cosmos-app   LoadBalancer   10.0.68.83   <pending>     8080:31523/TCP   6s
     ```
 
+    > [!NOTE]
     > `CLUSTER-IP` value may differ in your case
 
 1. Once Azure Load Balancer creation completes, the `EXTERNAL-IP` will be available.
@@ -270,12 +291,13 @@ az acr create --resource-group cosmosdb-springboot-aks-rg --location eastus \
    ```bash
     curl -i http://20.81.108.180:8080/users
    ```
-
+    
+   > [!NOTE]
    > `20.81.108.180` is the public IP address - replace it with the value for your setup
 
 ## Check data in Azure Cosmos DB
 
-Navigate to the Data Explorer menu of the Azure Cosmos DB account in the portal. Access the `users` container to confirm.
+Navigate to the `Data Explorer` menu of the Azure Cosmos DB account in the Azure portal. Access the `users` container to confirm. 
 
 ## Clean up resources
 
