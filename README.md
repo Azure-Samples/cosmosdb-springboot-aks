@@ -111,7 +111,8 @@ az acr create --resource-group cosmosdb-springboot-aks-rg --location eastus \
    azure.cosmos.uri=https://<enter cosmos db account name>.azure.com:443/
    azure.cosmos.key=<enter cosmos db primary key>
    azure.cosmos.database=<enter cosmos db database name>
-   azure.cosmos.populateQueryMetrics=false
+   azure.cosmos.queryMetricsEnabled=true
+   azure.cosmos.responseDiagnosticsEnabled=true
    ```
 
    > [!NOTE]
