@@ -105,7 +105,7 @@ az acr create --resource-group cosmosdb-springboot-aks-rg --location eastus \
 
 
 
-1. Before you run the application, update the `application.properties` file with the details of your Azure Cosmos DB account.
+1. Before you run the application, update the `src/main/resources/application.properties` file with the details of your Azure Cosmos DB account.
 
    ```properties
    azure.cosmos.uri=https://<enter cosmos db account name>.azure.com:443/
